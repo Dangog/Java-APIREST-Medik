@@ -1,0 +1,18 @@
+package mad.voll.api.controller;
+
+import mad.voll.api.pacients.PacientsData;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/pacient")
+public class PacientsController {
+
+    @PostMapping
+    public String saveData(@RequestBody PacientsData pacientsData){
+        return("The respective pacient was saved in database: " + pacientsData);
+    }
+}
+
