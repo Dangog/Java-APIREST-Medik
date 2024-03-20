@@ -4,9 +4,13 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import med.voll.api.model.Medic;
 import med.voll.api.model.MedicDTO;
+import med.voll.api.model.MedicEditDTO;
 import med.voll.api.model.MedicReturnData;
 import med.voll.api.repository.MedicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,7 +30,13 @@ public class MedicController {
     }
 
     @GetMapping
-    public List<MedicReturnData> list(){
-        return repository.findAll().stream().map(MedicReturnData::new).toList();
+    public Page<MedicReturnData> list(@PageableDefault(size=10, sort ={"nome"}) Pageable pageable){
+        return repository.findAll(pageable).map(MedicReturnData::new);
+    }
+
+    @PutMapping
+    @Transactional
+    public void editMedic(@RequestBody @Valid MedicEditDTO data){
+
     }
 }
