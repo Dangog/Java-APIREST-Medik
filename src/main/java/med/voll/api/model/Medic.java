@@ -31,16 +31,35 @@ public class Medic {
     @Enumerated(EnumType.STRING)
     private Especialidade especialidade;
 
+    private Boolean status;
+
     @Embedded
     private Endereco endereco;
 
 
     public Medic(MedicDTO data) {
+        this.status = true;
         this.nome = data.nome();
         this.email = data.email();
         this.telefone = data.telefone();
         this.crm = data.crm();
         this.especialidade = data.especialidade();
         this.endereco = new Endereco(data.endereco());
+    }
+
+    public void changeMedicData(MedicEditDTO medicData) {
+        if (medicData.nome() != null){
+            this.nome = medicData.nome();
+        }
+        if (medicData.telefone() != null){
+            this.telefone = medicData.telefone();
+        }
+        if (medicData.endereco() != null){
+            this.endereco.editAdress(medicData.endereco());
+        }
+    }
+
+    public void deleteMedic() {
+        this.status = false;
     }
 }

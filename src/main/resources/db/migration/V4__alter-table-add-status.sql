@@ -1,0 +1,1 @@
+update medics set status = 1;

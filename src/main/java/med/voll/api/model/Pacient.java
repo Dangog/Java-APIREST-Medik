@@ -20,6 +20,8 @@ public class Pacient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private boolean status;
+
     private String nome;
 
     private String email;
@@ -32,10 +34,27 @@ public class Pacient {
     private Endereco endereco;
 
     public Pacient(PacientDTO dados) {
+        this.status = true;
         this.nome = dados.nome();
         this.email = dados.email();
         this.cpf = dados.cpf();
         this.telefone = dados.telefone();
         this.endereco = new Endereco(dados.endereco());
+    }
+
+    public void updateData(PacientEditDTO pacientData) {
+        if (pacientData.nome() != null){
+            this.nome = pacientData.nome();
+        }
+        if (pacientData.telefone() != null){
+            this.telefone = pacientData.telefone();
+        }
+        if (pacientData.endereco() != null){
+            this.endereco.editAdress(pacientData.endereco());
+        }
+    }
+
+    public void deletePacient() {
+        this.status = false;
     }
 }
