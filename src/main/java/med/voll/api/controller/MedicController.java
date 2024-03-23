@@ -2,16 +2,15 @@ package med.voll.api.controller;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import med.voll.api.model.Medic;
-import med.voll.api.model.MedicDTO;
-import med.voll.api.model.MedicEditDTO;
-import med.voll.api.model.MedicReturnData;
+import med.voll.api.model.*;
 import med.voll.api.repository.MedicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -24,29 +23,40 @@ public class MedicController {
 
     @PostMapping("/create")
     @Transactional
-    public String createMedics(@RequestBody @Valid MedicDTO data){
-        repository.save(new Medic(data));
-        return "Médico cadastrado com sucesso";
+    public ResponseEntity createMedics(@RequestBody @Valid MedicDTO data, UriComponentsBuilder uriBuilder){;
+        var medic = new Medic(data);
+        repository.save(medic);
+
+        var uri = uriBuilder.path("/medics/create/{id}").buildAndExpand(medic.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(new MedicAllAttributesMedic(medic));
     }
 
     @GetMapping
-    public Page<MedicReturnData> list(@PageableDefault(size=10, sort ={"nome"}) Pageable pageable){
-        return repository.findAllByStatusTrue(pageable).map(MedicReturnData::new);
+    public ResponseEntity<Page<MedicReturnData>> list(@PageableDefault(size=10, sort ={"nome"}) Pageable pageable){
+        var page = repository.findAllByStatusTrue(pageable).map(MedicReturnData::new);
+        return ResponseEntity.ok(page);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity medicDetails(@PathVariable Long id){
+        var medic = repository.getReferenceById(id);
+        return ResponseEntity.ok(new MedicAllAttributesMedic(medic));
     }
 
     @PutMapping("/edit")
     @Transactional
-    public String editMedic(@RequestBody @Valid MedicEditDTO data){
+    public ResponseEntity editMedic(@RequestBody @Valid MedicEditDTO data){
        var medic = repository.getReferenceById(data.id());
        medic.changeMedicData(data);
-       return "Dados do médico alterados com sucesso";
+       return ResponseEntity.ok(new MedicAllAttributesMedic(medic));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
-    public String deleteMedic(@PathVariable Long id){
+    public ResponseEntity deleteMedic(@PathVariable Long id){
         var medic = repository.getReferenceById(id);
         medic.deleteMedic();
-        return "Medico deletado com sucesso!";
+        return ResponseEntity.noContent().build();
     }
 }
