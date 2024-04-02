@@ -1,8 +1,10 @@
 package med.voll.api.infra.security;
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import jakarta.validation.Valid;
 import med.voll.api.model.Usuario;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +34,19 @@ public class TokenService {
         } catch (JWTCreationException exception){
             // Invalid Signing configuration / Couldn't convert Claims.
             throw new RuntimeException("Generate JWT Error", exception);
+        }
+    }
+
+    public String getSubject(String JWTToken) {
+        try {
+            var algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                    .withIssuer("Vollmed API")
+                    .build()
+                    .verify(JWTToken)
+                    .getSubject();
+        } catch (JWTVerificationException exception) {
+            throw new RuntimeException("Invalid or Expired JWT Token");
         }
     }
 
