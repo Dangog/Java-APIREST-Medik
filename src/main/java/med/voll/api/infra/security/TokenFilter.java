@@ -31,8 +31,10 @@ public class TokenFilter extends OncePerRequestFilter {
             var user = usuarioRepository.findByLogin(subject);
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            System.out.println("Logado");
 
-            SecurityContextHolder.getContext().setAuthentication(authentication);}
+        }
 
         filterChain.doFilter(request,response);
     }
