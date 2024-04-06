@@ -14,5 +14,7 @@ public record AppointmentDataDTO(
 
     @NotNull
     @Future
-    LocalDateTime date) {
+    LocalDateTime date,
+
+    Especialidade speciality) {
 }
