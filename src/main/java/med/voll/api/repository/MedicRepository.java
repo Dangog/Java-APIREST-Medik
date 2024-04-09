@@ -17,12 +17,12 @@ public interface MedicRepository extends JpaRepository<Medic,Long> {
     @Query("""
                 select m from Medic m
                 where
-                m.status = 1
+                m.status = true
                 and
                 m.especialidade = :especialidade
                 and
                 m.id not in(
-                        select c.medic.id from Appointment a
+                        select a.medic.id from Appointment a
                         where
                         a.data = :data
                 )
