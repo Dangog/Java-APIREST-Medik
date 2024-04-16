@@ -3,6 +3,7 @@ package med.voll.api.controller;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import med.voll.api.model.AppointmentDataDTO;
+import med.voll.api.model.UnscheduleAppointmentDataDTO;
 import med.voll.api.service.AppointmentSchedule;
 import med.voll.api.model.ScheduledAppointmentData;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,18 +20,15 @@ public class AppointmentController {
     @PostMapping
     @Transactional
     public ResponseEntity scheduleAppointment(@RequestBody @Valid AppointmentDataDTO appointmentData){
-        System.out.println(appointmentData.idMedic());
         appointmentSchedule.schedule(appointmentData);
         return ResponseEntity.ok(new ScheduledAppointmentData(null,appointmentData.idMedic(), appointmentData.idPacient(), appointmentData.date()));
     }
 
     @DeleteMapping
     @Transactional
-    public String unscheduleAppointment(@RequestBody @Valid AppointmentDataDTO appointmentDataDTO){
-
-        return "teste";
+    public ResponseEntity unscheduleAppointment(@RequestBody @Valid UnscheduleAppointmentDataDTO unscheduleAppointmentDataDTO){
+        appointmentSchedule.unschedule(unscheduleAppointmentDataDTO);
+        return ResponseEntity.noContent().build();
     }
-
-
 
 }

@@ -32,7 +32,6 @@ public class TokenFilter extends OncePerRequestFilter {
 
             var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            System.out.println("Logado");
 
         }
 

@@ -8,9 +8,14 @@ import med.voll.api.repository.AppointmentRepository;
 import med.voll.api.repository.MedicRepository;
 import med.voll.api.repository.PacientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import javax.management.RuntimeErrorException;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class AppointmentSchedule {
@@ -37,24 +42,38 @@ public class AppointmentSchedule {
         Pacient pacient = pacientRepository.findById(data.idPacient()).get();
         Medic medic = selectRandomAvaliableMedic(data);
 
-        Appointment appointment = new Appointment(null, medic,pacient,data.date());
+        Appointment appointment = new Appointment(null, medic,pacient,true,data.date());
         appointmentRepository.save(appointment);
     }
 
     public Medic selectRandomAvaliableMedic(AppointmentDataDTO data){
-
         if (data.idMedic() != null){
           return medicRepository.getReferenceById(data.idMedic());
         }
-
         if (data.speciality() == null){
             throw new NotNullValidationException("Speciality attribute required!");
         }
+        return medicRepository.selectRandomMedicByAvaliabilityAndSpeciality(data.speciality(), data.date());
+    }
 
-        System.out.println(data.speciality());
-        System.out.println(data.date());
+    public void unschedule(UnscheduleAppointmentDataDTO data){
 
-        return medicRepository.selectRandomMedicByAvaliabilityAndSpeciality(data.speciality());
+        if (!appointmentRepository.existsById(data.id())){
+            throw new RuntimeException("Appointment ID not found!");
+        }
+
+        Appointment appointment = appointmentRepository.getReferenceById(data.id());
+
+        LocalDateTime requisitionDate = LocalDateTime.now();
+        LocalDateTime appointmentData = appointment.getData();
+
+        Duration d = Duration.between(requisitionDate, appointmentData);
+
+        if (d.toHours() < 24) {
+            throw new RuntimeException("Minimum 24 hours notice to cancel!");
+        }
+
+        appointment.setStatus(false);
     }
 
 
