@@ -34,26 +34,27 @@ public class AppointmentSchedule {
             throw new NotNullValidationException("Invalid or not found Medic ID");
         }
 
-
         Pacient pacient = pacientRepository.findById(data.idPacient()).get();
-        Medic medic = medicRepository.findById(data.idMedic()).get();
-
-
+        Medic medic = selectRandomAvaliableMedic(data);
 
         Appointment appointment = new Appointment(null, medic,pacient,data.date());
         appointmentRepository.save(appointment);
     }
 
     public Medic selectRandomAvaliableMedic(AppointmentDataDTO data){
+
         if (data.idMedic() != null){
-            medicRepository.getReferenceById(data.idMedic());
+          return medicRepository.getReferenceById(data.idMedic());
         }
 
         if (data.speciality() == null){
             throw new NotNullValidationException("Speciality attribute required!");
         }
 
-        return medicRepository.selectRandomMedicByAvaliabilityAndSpeciality(data.speciality(), data.date());
+        System.out.println(data.speciality());
+        System.out.println(data.date());
+
+        return medicRepository.selectRandomMedicByAvaliabilityAndSpeciality(data.speciality());
     }
 
 
