@@ -29,5 +29,9 @@ public class Appointment {
     private Boolean status = true;
 
     private LocalDateTime data;
+
+    @Column(name = "cancel_justification")
+    @Enumerated(EnumType.STRING)
+    private Justification justification;
 }
 

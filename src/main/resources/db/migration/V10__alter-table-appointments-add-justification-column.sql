@@ -1,0 +1,1 @@
+alter table appointments add column cancel_justification varchar(100);

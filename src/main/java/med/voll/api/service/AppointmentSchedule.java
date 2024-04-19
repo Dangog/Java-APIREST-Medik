@@ -42,7 +42,7 @@ public class AppointmentSchedule {
         Pacient pacient = pacientRepository.findById(data.idPacient()).get();
         Medic medic = selectRandomAvaliableMedic(data);
 
-        Appointment appointment = new Appointment(null, medic,pacient,true,data.date());
+        Appointment appointment = new Appointment(null, medic,pacient,true,data.date(),null);
         appointmentRepository.save(appointment);
     }
 
@@ -74,6 +74,7 @@ public class AppointmentSchedule {
         }
 
         appointment.setStatus(false);
+        appointment.setJustification(data.justification());
     }
 
 
