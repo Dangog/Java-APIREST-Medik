@@ -10,6 +10,7 @@ import med.voll.api.repository.PacientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import med.voll.api.validations.DataValidation;
 
 import javax.management.RuntimeErrorException;
 import java.time.Duration;
@@ -29,7 +30,12 @@ public class AppointmentSchedule {
     @Autowired
     private PacientRepository pacientRepository;
 
+    @Autowired
+    private DataValidation dataValidation;
+
     public void schedule(@Valid AppointmentDataDTO data){
+
+        dataValidation.dataValidation(data);
 
         if (!pacientRepository.existsById(data.idPacient())){
             throw new NotNullValidationException("Invalid or not found Pacient ID");
