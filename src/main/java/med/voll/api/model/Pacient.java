@@ -20,7 +20,7 @@ public class Pacient {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private boolean status;
+    private Boolean status;
 
     private String nome;
 

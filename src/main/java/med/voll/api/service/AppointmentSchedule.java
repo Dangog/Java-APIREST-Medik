@@ -7,6 +7,9 @@ import med.voll.api.model.*;
 import med.voll.api.repository.AppointmentRepository;
 import med.voll.api.repository.MedicRepository;
 import med.voll.api.repository.PacientRepository;
+import med.voll.api.validations.ActiveMedicValidation;
+import med.voll.api.validations.ActivePacientValidation;
+import med.voll.api.validations.AdvanceTimeValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
@@ -33,9 +36,19 @@ public class AppointmentSchedule {
     @Autowired
     private DataValidation dataValidation;
 
+    @Autowired
+    private AdvanceTimeValidation advanceTimeValidation;
+
+    @Autowired
+    private ActiveMedicValidation activeMedicValidation;
+
+    @Autowired
+    private ActivePacientValidation activePacientValidation;
+
     public void schedule(@Valid AppointmentDataDTO data){
 
         dataValidation.dataValidation(data);
+        advanceTimeValidation.advanceTimeValidation(data);
 
         if (!pacientRepository.existsById(data.idPacient())){
             throw new NotNullValidationException("Invalid or not found Pacient ID");
@@ -46,6 +59,10 @@ public class AppointmentSchedule {
         }
 
         Pacient pacient = pacientRepository.findById(data.idPacient()).get();
+        activePacientValidation.activePacientValidation(pacient);
+
+
+
         Medic medic = selectRandomAvaliableMedic(data);
 
         Appointment appointment = new Appointment(null, medic,pacient,true,data.date(),null);
@@ -54,7 +71,9 @@ public class AppointmentSchedule {
 
     public Medic selectRandomAvaliableMedic(AppointmentDataDTO data){
         if (data.idMedic() != null){
-          return medicRepository.getReferenceById(data.idMedic());
+          Medic medic =  medicRepository.getReferenceById(data.idMedic());
+          activeMedicValidation.activeMedicValidation(medic);
+          return medic;
         }
         if (data.speciality() == null){
             throw new NotNullValidationException("Speciality attribute required!");
