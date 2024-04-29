@@ -25,5 +25,13 @@ public class ActiveMedicValidation implements AppointmentSchedulePreValidations 
         if (medic.getStatus() == false){
             throw new NotNullValidationException("Current medic isn't avaliable");
         }
+import org.springframework.stereotype.Service;
+
+@Service
+public class ActiveMedicValidation {
+    public void activeMedicValidation(Medic medic){
+            if (medic.getStatus() == false){
+                throw new RuntimeException("Current medic isn't avaliable");
+            }
     }
 }
