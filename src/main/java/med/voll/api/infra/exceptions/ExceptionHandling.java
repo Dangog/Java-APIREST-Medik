@@ -2,6 +2,8 @@ package med.voll.api.infra.exceptions;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.*;
+import jakarta.validation.ValidationException;
+import med.voll.api.validations.AppointmentSchedulePreValidations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -52,11 +54,18 @@ public class ExceptionHandling {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: " +ex.getLocalizedMessage());
     }
 
+    @ExceptionHandler(NotNullValidationException.class)
+    public ResponseEntity validationErrosHandler(NotNullValidationException ex) {
+       return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
     private record DadosErroValidacao(String campo, String mensagem) {
         public DadosErroValidacao(FieldError erro) {
             this(erro.getField(), erro.getDefaultMessage());
         }
     }
+
+
 
 
 }

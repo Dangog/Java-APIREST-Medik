@@ -1,5 +1,6 @@
 package med.voll.api.validations;
 
+import med.voll.api.infra.exceptions.NotNullValidationException;
 import med.voll.api.model.AppointmentDataDTO;
 import med.voll.api.model.Medic;
 import med.voll.api.model.Pacient;
@@ -20,7 +21,7 @@ public class MedicWithAnotherAppointmentSchedule implements AppointmentScheduleP
 
         boolean medicDateValid = appointmentRepository.existsByMedicIdAndData(appointmentDataDTO.idMedic(), appointmentDataDTO.date());
         if (medicDateValid) {
-            throw new RuntimeException("Medic already has a scheduled appointment");
+            throw new NotNullValidationException("Medic already has a scheduled appointment");
         }
     }
 }

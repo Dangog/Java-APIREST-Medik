@@ -34,7 +34,7 @@ public class AppointmentSchedule {
     @Autowired
     private List<AppointmentSchedulePreValidations> validationsList;
 
-    public void schedule(@Valid AppointmentDataDTO data){
+    public ScheduledAppointmentData schedule(@Valid AppointmentDataDTO data){
 
         if (!pacientRepository.existsById(data.idPacient())){
             throw new NotNullValidationException("Invalid or not found Pacient ID");
@@ -49,8 +49,15 @@ public class AppointmentSchedule {
         Pacient pacient = pacientRepository.findById(data.idPacient()).get();
         Medic medic = selectRandomAvaliableMedic(data);
 
+        if (medic == null) {
+            throw new NotNullValidationException("There's no medic avaliable in the required date");
+        }
+
         Appointment appointment = new Appointment(null, medic,pacient,true,data.date(),null);
         appointmentRepository.save(appointment);
+
+        return new ScheduledAppointmentData(appointment);
+
     }
 
     public Medic selectRandomAvaliableMedic(AppointmentDataDTO data){

@@ -1,5 +1,6 @@
 package med.voll.api.validations;
 
+import med.voll.api.infra.exceptions.NotNullValidationException;
 import med.voll.api.model.AppointmentDataDTO;
 import med.voll.api.model.Medic;
 import med.voll.api.repository.MedicRepository;
@@ -22,7 +23,7 @@ public class ActiveMedicValidation implements AppointmentSchedulePreValidations 
         var medic = medicRepository.getReferenceById(dataDTO.idMedic());
 
         if (medic.getStatus() == false){
-            throw new RuntimeException("Current medic isn't avaliable");
+            throw new NotNullValidationException("Current medic isn't avaliable");
         }
     }
 }

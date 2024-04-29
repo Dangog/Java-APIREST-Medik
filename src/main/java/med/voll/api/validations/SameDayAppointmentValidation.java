@@ -1,5 +1,6 @@
 package med.voll.api.validations;
 
+import med.voll.api.infra.exceptions.NotNullValidationException;
 import med.voll.api.model.AppointmentDataDTO;
 import med.voll.api.model.Pacient;
 import med.voll.api.repository.AppointmentRepository;
@@ -22,7 +23,7 @@ public class SameDayAppointmentValidation implements AppointmentSchedulePreValid
 
         boolean pacientDateValid = appointmentRepository.existsByPacientIdAndDataBetween(appointmentDataDTO.idPacient(),firstHour,lastHour);
         if (pacientDateValid) {
-            throw new RuntimeException("Pacient already has a scheduled appointment");
+            throw new NotNullValidationException("Pacient already has a scheduled appointment");
         }
     }
 }

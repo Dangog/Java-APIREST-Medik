@@ -1,5 +1,6 @@
 package med.voll.api.validations;
 
+import med.voll.api.infra.exceptions.NotNullValidationException;
 import med.voll.api.model.AppointmentDataDTO;
 import med.voll.api.model.ScheduledAppointmentData;
 import med.voll.api.model.UnscheduleAppointmentDataDTO;
@@ -19,7 +20,7 @@ public class AdvanceTimeValidation implements AppointmentSchedulePreValidations{
     public void validation(AppointmentDataDTO data){
 
         if (localDateTime.now().plusMinutes(30).isAfter(data.date())){
-            throw new RuntimeException("Mininum advance time is 30 minutes");
+            throw new NotNullValidationException("Mininum advance time is 30 minutes");
         }
     }
 
