@@ -7,19 +7,20 @@ import med.voll.api.model.*;
 import med.voll.api.repository.AppointmentRepository;
 import med.voll.api.repository.MedicRepository;
 import med.voll.api.repository.PacientRepository;
+import med.voll.api.validations.*;
 import med.voll.api.validations.ActiveMedicValidation;
 import med.voll.api.validations.ActivePacientValidation;
 import med.voll.api.validations.AdvanceTimeValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
-import med.voll.api.validations.DataValidation;
 
 import javax.management.RuntimeErrorException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Service
 public class AppointmentSchedule {
@@ -34,8 +35,9 @@ public class AppointmentSchedule {
     private PacientRepository pacientRepository;
 
     @Autowired
-    private DataValidation dataValidation;
+    private List<AppointmentSchedulePreValidations> validationsList;
 
+    public ScheduledAppointmentData schedule(@Valid AppointmentDataDTO data){
     @Autowired
     private AdvanceTimeValidation advanceTimeValidation;
 
@@ -58,6 +60,8 @@ public class AppointmentSchedule {
             throw new NotNullValidationException("Invalid or not found Medic ID");
         }
 
+        validationsList.forEach(v -> v.validation(data));
+
         Pacient pacient = pacientRepository.findById(data.idPacient()).get();
         activePacientValidation.activePacientValidation(pacient);
 
@@ -65,14 +69,25 @@ public class AppointmentSchedule {
 
         Medic medic = selectRandomAvaliableMedic(data);
 
+        if (medic == null) {
+            throw new NotNullValidationException("There's no medic avaliable in the required date");
+        }
+
         Appointment appointment = new Appointment(null, medic,pacient,true,data.date(),null);
         appointmentRepository.save(appointment);
+
+        return new ScheduledAppointmentData(appointment);
+
     }
 
     public Medic selectRandomAvaliableMedic(AppointmentDataDTO data){
         if (data.idMedic() != null){
+
+          Medic medic =  medicRepository.getReferenceById(data.idMedic());;
+
           Medic medic =  medicRepository.getReferenceById(data.idMedic());
           activeMedicValidation.activeMedicValidation(medic);
+
           return medic;
         }
         if (data.speciality() == null){
