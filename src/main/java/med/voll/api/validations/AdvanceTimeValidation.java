@@ -12,25 +12,14 @@ import java.time.LocalDateTime;
 
 
 @Component
-public class AdvanceTimeValidation implements AppointmentSchedulePreValidations{
+public class AdvanceTimeValidation implements AppointmentSchedulePreValidations {
 
     private LocalDateTime localDateTime;
 
-    public void validation(AppointmentDataDTO data){
+    public void validation(AppointmentDataDTO data) {
 
-        if (localDateTime.now().plusMinutes(30).isAfter(data.date())){
+        if (localDateTime.now().plusMinutes(30).isAfter(data.date())) {
             throw new NotNullValidationException("Mininum advance time is 30 minutes");
-
-@Service
-public class AdvanceTimeValidation {
-
-    private LocalDateTime localDateTime;
-
-    public void advanceTimeValidation(AppointmentDataDTO data){
-
-        if (localDateTime.now().plusMinutes(30).isAfter(data.date())){
-            throw new RuntimeException("Mininum advance time is 30 minutes");
         }
     }
-
 }

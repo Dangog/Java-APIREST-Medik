@@ -13,21 +13,15 @@ import java.time.LocalDateTime;
 
 @Component
 public class MedicWithAnotherAppointmentSchedule implements AppointmentSchedulePreValidations {
-@Service
-public class MedicWithAnotherAppointmentSchedule {
 
-    @Autowired
-    private AppointmentRepository appointmentRepository;
+        @Autowired
+        private AppointmentRepository appointmentRepository;
 
-    public void validation(AppointmentDataDTO appointmentDataDTO) {
+        public void validation(AppointmentDataDTO appointmentDataDTO) {
 
-        boolean medicDateValid = appointmentRepository.existsByMedicIdAndData(appointmentDataDTO.idMedic(), appointmentDataDTO.date());
-        if (medicDateValid) {
-            throw new NotNullValidationException("Medic already has a scheduled appointment");
-    public void medicWithAnotherAppointmentSchedule(Medic medic, LocalDateTime date) {
-        boolean medicDateValid = appointmentRepository.existsByMedicIdAndData(medic.getId(), date);
-        if (medicDateValid) {
-            throw new RuntimeException("Medic already has a scheduled appointment");
+            boolean medicDateValid = appointmentRepository.existsByMedicIdAndData(appointmentDataDTO.idMedic(), appointmentDataDTO.date());
+            if (medicDateValid) {
+                throw new NotNullValidationException("Medic already has a scheduled appointment");
+            }
         }
     }
-}

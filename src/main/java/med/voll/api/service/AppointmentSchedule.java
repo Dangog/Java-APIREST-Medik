@@ -14,6 +14,7 @@ import med.voll.api.validations.AdvanceTimeValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
+import med.voll.api.model.*;
 
 import javax.management.RuntimeErrorException;
 import java.time.Duration;
@@ -37,68 +38,48 @@ public class AppointmentSchedule {
     @Autowired
     private List<AppointmentSchedulePreValidations> validationsList;
 
-    public ScheduledAppointmentData schedule(@Valid AppointmentDataDTO data){
-    @Autowired
-    private AdvanceTimeValidation advanceTimeValidation;
+    public ScheduledAppointmentData schedule(@Valid AppointmentDataDTO data) {
 
-    @Autowired
-    private ActiveMedicValidation activeMedicValidation;
+            if (!pacientRepository.existsById(data.idPacient())) {
+                throw new NotNullValidationException("Invalid or not found Pacient ID");
+            }
 
-    @Autowired
-    private ActivePacientValidation activePacientValidation;
+            if (data.idMedic() != null && !medicRepository.existsById(data.idMedic())) {
+                throw new NotNullValidationException("Invalid or not found Medic ID");
+            }
 
-    public void schedule(@Valid AppointmentDataDTO data){
+            validationsList.forEach(v -> v.validation(data));
 
-        dataValidation.dataValidation(data);
-        advanceTimeValidation.advanceTimeValidation(data);
+            Pacient pacient = pacientRepository.findById(data.idPacient()).get();
 
-        if (!pacientRepository.existsById(data.idPacient())){
-            throw new NotNullValidationException("Invalid or not found Pacient ID");
-        }
+            Medic medic = selectRandomAvaliableMedic(data);
 
-        if (data.idMedic() != null && !medicRepository.existsById(data.idMedic())){
-            throw new NotNullValidationException("Invalid or not found Medic ID");
-        }
+            if (medic == null) {
+                throw new NotNullValidationException("There's no medic avaliable in the required date");
+            }
 
-        validationsList.forEach(v -> v.validation(data));
+            Appointment appointment = new Appointment(null, medic, pacient, true, data.date(), null);
+            appointmentRepository.save(appointment);
 
-        Pacient pacient = pacientRepository.findById(data.idPacient()).get();
-        activePacientValidation.activePacientValidation(pacient);
-
-
-
-        Medic medic = selectRandomAvaliableMedic(data);
-
-        if (medic == null) {
-            throw new NotNullValidationException("There's no medic avaliable in the required date");
-        }
-
-        Appointment appointment = new Appointment(null, medic,pacient,true,data.date(),null);
-        appointmentRepository.save(appointment);
-
-        return new ScheduledAppointmentData(appointment);
-
+            return new ScheduledAppointmentData(appointment);
     }
 
-    public Medic selectRandomAvaliableMedic(AppointmentDataDTO data){
-        if (data.idMedic() != null){
+    public Medic selectRandomAvaliableMedic(AppointmentDataDTO data) {
+        if (data.idMedic() != null) {
 
-          Medic medic =  medicRepository.getReferenceById(data.idMedic());;
+            Medic medic = medicRepository.getReferenceById(data.idMedic());
 
-          Medic medic =  medicRepository.getReferenceById(data.idMedic());
-          activeMedicValidation.activeMedicValidation(medic);
-
-          return medic;
+            return medic;
         }
-        if (data.speciality() == null){
+        if (data.speciality() == null) {
             throw new NotNullValidationException("Speciality attribute required!");
         }
         return medicRepository.selectRandomMedicByAvaliabilityAndSpeciality(data.speciality(), data.date());
     }
 
-    public void unschedule(UnscheduleAppointmentDataDTO data){
+    public void unschedule(UnscheduleAppointmentDataDTO data) {
 
-        if (!appointmentRepository.existsById(data.id())){
+        if (!appointmentRepository.existsById(data.id())) {
             throw new RuntimeException("Appointment ID not found!");
         }
 
@@ -116,6 +97,4 @@ public class AppointmentSchedule {
         appointment.setStatus(false);
         appointment.setJustification(data.justification());
     }
-
-
 }
