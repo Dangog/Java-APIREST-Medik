@@ -47,6 +47,7 @@ public class Medic {
         this.endereco = new Endereco(data.endereco());
     }
 
+
     public void changeMedicData(MedicEditDTO medicData) {
         if (medicData.nome() != null){
             this.nome = medicData.nome();

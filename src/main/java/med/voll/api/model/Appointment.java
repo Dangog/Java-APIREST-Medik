@@ -33,6 +33,9 @@ public class Appointment {
     @Column(name = "cancel_justification")
     @Enumerated(EnumType.STRING)
     private Justification justification;
+
+    public Appointment(Long id, Medic medic, Pacient pacient, LocalDateTime date) {
+    }
 }
 
 
