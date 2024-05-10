@@ -34,7 +34,11 @@ public class Appointment {
     @Enumerated(EnumType.STRING)
     private Justification justification;
 
-    public Appointment(Long id, Medic medic, Pacient pacient, LocalDateTime date) {
+    public Appointment(Long id, Medic medic, Pacient pacient, LocalDateTime data) {
+        this.id = id;
+        this.medic = medic;
+        this.pacient = pacient;
+        this.data = data;
     }
 }
 

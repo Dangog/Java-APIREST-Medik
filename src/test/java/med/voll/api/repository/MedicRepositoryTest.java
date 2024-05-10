@@ -1,5 +1,6 @@
 package med.voll.api.repository;
 import med.voll.api.model.*;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -29,12 +30,13 @@ class MedicRepositoryTest {
     private TestEntityManager testEntityManager;
 
     @Test
-    void selectRandomMedicByAvaliabilityAndSpeciality() {
+    @DisplayName("Medic is not avalliable, should medic return must be null")
+    void selectRandomMedicByAvaliabilityAndSpecialityCenary1() {
 
     var nextMondayAt10Am = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY))
                     .atTime(10, 0);
 
-    var medic = createMedic("Danilo Medico ","cajedanilo@gmail.com","34444444444",Especialidade.CARDIOLOGIA);
+    var medic = createMedic("Danilo Medico ","cajedanilo@gmail.com","121059",Especialidade.CARDIOLOGIA);
     var pacient = createPacient("Diego Paciente","diegocaje@gmail.com","33333333333");
     scheduleAppointment(medic,pacient,nextMondayAt10Am);
 
@@ -43,18 +45,32 @@ class MedicRepositoryTest {
     assertThat(avaliableMedic).isNull();
     }
 
-    private void scheduleAppointment(Medic medic, Pacient pacient, LocalDateTime date) {
-        testEntityManager.persist(new Appointment(null, medic, pacient, date));
+    @Test
+    @DisplayName("Medic is not avalliable, should medic return must be null")
+    void selectRandomMedicByAvaliabilityAndSpecialityCenary2() {
+
+        var nextMondayAt10Am = LocalDate.now().with(TemporalAdjusters.next(DayOfWeek.MONDAY))
+                .atTime(10, 0);
+
+        var medic = createMedic("Danilo Medico ","cajedanilo@gmail.com","121059",Especialidade.CARDIOLOGIA);
+
+        var avaliableMedic = medicRepository.selectRandomMedicByAvaliabilityAndSpeciality(Especialidade.CARDIOLOGIA,nextMondayAt10Am);
+
+        assertThat(avaliableMedic).isEqualTo(medic);
+    }
+
+    private void scheduleAppointment(Medic medic, Pacient pacient, LocalDateTime data) {
+        testEntityManager.persist(new Appointment(null, medic,pacient,data));
     }
 
     private Medic createMedic(String name, String email, String crm, Especialidade especialidade) {
-        var medic = new Medic(dadosMedico(name, email, crm, especialidade));
+        var medic = new Medic(medicDTO(name, email, crm, especialidade));
         testEntityManager.persist(medic);
         return medic;
     }
 
     private Pacient createPacient(String name, String email, String cpf) {
-        var pacient = new Pacient(dadosPaciente(name, email, cpf));
+        var pacient = new Pacient(pacientDTO(name, email, cpf));
         testEntityManager.persist(pacient);
         return pacient;
     }
